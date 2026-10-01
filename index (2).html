@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>나랑 데이트 할래?</title>
+
+<style>
+*{
+  box-sizing:border-box;
+}
+
+body{
+  margin:0;
+  height:100vh;
+  overflow:hidden;
+
+  display:flex;
+  justify-content:center;
+  align-items:center;
+
+  font-family:Arial,"Noto Sans KR",sans-serif;
+
+  background:
+    linear-gradient(135deg,#ffd6e7,#e8d8ff);
+}
+
+.card{
+  width:min(700px,90vw);
+  padding:55px 30px;
+  text-align:center;
+
+  background:rgba(255,255,255,.94);
+
+  border-radius:30px;
+
+  box-shadow:
+    0 15px 50px rgba(0,0,0,.15);
+}
+
+h1{
+  margin:0 0 35px;
+  font-size:clamp(30px,6vw,54px);
+}
+
+.buttons{
+  height:70px;
+  position:relative;
+}
+
+button{
+  position:fixed;
+
+  border:0;
+  border-radius:16px;
+
+  padding:18px 38px;
+
+  font-size:22px;
+  font-weight:700;
+
+  cursor:pointer;
+
+  box-shadow:
+    0 6px 15px rgba(0,0,0,.12);
+
+  user-select:none;
+
+  z-index:10;
+}
+
+#yes{
+  background:#ff5b91;
+  color:white;
+}
+
+#no{
+  background:#eee;
+  color:#333;
+}
+
+#message{
+  margin-top:28px;
+  min-height:32px;
+
+  font-size:20px;
+  font-weight:700;
+}
+
+
+/* 날짜 선택 화면 */
+
+#dateScreen{
+  display:none;
+}
+
+#dateScreen h1{
+  margin-bottom:18px;
+}
+
+.dateText{
+  font-size:22px;
+  font-weight:700;
+  margin-bottom:25px;
+}
+
+.dateInputs{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:15px;
+  flex-wrap:wrap;
+}
+
+.inputGroup{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+
+.inputGroup label{
+  font-size:16px;
+  font-weight:700;
+  color:#555;
+}
+
+input[type="date"],
+input[type="time"]{
+  width:250px;
+
+  padding:15px;
+
+  border:2px solid #ffb3cc;
+  border-radius:14px;
+
+  font-size:20px;
+  font-family:inherit;
+
+  outline:none;
+  background:white;
+
+  cursor:pointer;
+}
+
+input[type="date"]:focus,
+input[type="time"]:focus{
+  border-color:#ff5b91;
+}
+
+#confirmDate{
+  position:static;
+
+  display:block;
+
+  margin:28px auto 0;
+
+  background:#ff5b91;
+  color:white;
+}
+
+
+/* 결과 화면 */
+
+#resultScreen{
+  display:none;
+}
+
+.heart{
+  font-size:65px;
+  margin-bottom:10px;
+}
+
+#resultScreen h1{
+  margin-bottom:20px;
+}
+
+.resultDate{
+  font-size:28px;
+  line-height:1.6;
+  font-weight:700;
+  color:#ff4f87;
+}
+
+
+/* 마지막 기회 */
+
+#lastChance{
+  display:none;
+}
+
+#lastChance h1{
+  margin-bottom:20px;
+}
+
+#lastChance p{
+  font-size:22px;
+  font-weight:700;
+}
+
+#retry{
+  position:static;
+
+  background:#ff5b91;
+  color:white;
+
+  margin-top:10px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+
+
+  <!-- =====================
+       처음 화면
+  ====================== -->
+
+  <div id="mainScreen">
+
+    <h1 id="question">
+      나랑 데이트 할래?
+    </h1>
+
+    <div class="buttons">
+
+      <button id="yes">
+        네
+      </button>
+
+      <button id="no">
+        아니요
+      </button>
+
+    </div>
+
+    <div id="message"></div>
+
+  </div>
+
+
+  <!-- =====================
+       날짜 + 시간 선택
+  ====================== -->
+
+  <div id="dateScreen">
+
+    <h1>
+      좋아! 💕
+    </h1>
+
+    <div class="dateText">
+      우리 언제 데이트 할까?
+    </div>
+
+
+    <div class="dateInputs">
+
+      <div class="inputGroup">
+
+        <label for="datePicker">
+          📅 날짜
+        </label>
+
+        <input
+          type="date"
+          id="datePicker"
+        >
+
+      </div>
+
+
+      <div class="inputGroup">
+
+        <label for="timePicker">
+          ⏰ 시간
+        </label>
+
+        <input
+          type="time"
+          id="timePicker"
+        >
+
+      </div>
+
+    </div>
+
+
+    <button id="confirmDate">
+      이 날 이 시간으로 정하기 💗
+    </button>
+
+  </div>
+
+
+  <!-- =====================
+       결과 화면
+  ====================== -->
+
+  <div id="resultScreen">
+
+    <div class="heart">
+      💕
+    </div>
+
+    <h1>
+      데이트 약속 완료!
+    </h1>
+
+    <div
+      class="resultDate"
+      id="resultDate">
+    </div>
+
+  </div>
+
+
+  <!-- =====================
+       마지막 기회
+  ====================== -->
+
+  <div id="lastChance">
+
+    <h1>
+      마지막 기회를 줄게
+    </h1>
+
+    <p>
+      그래도 나랑 데이트 안 할 거야? 🥺
+    </p>
+
+    <button id="retry">
+      다시하기
+    </button>
+
+  </div>
+
+</div>
+
+
+<script>
+
+const yes =
+  document.getElementById("yes");
+
+const no =
+  document.getElementById("no");
+
+const mainScreen =
+  document.getElementById("mainScreen");
+
+const dateScreen =
+  document.getElementById("dateScreen");
+
+const resultScreen =
+  document.getElementById("resultScreen");
+
+const lastChance =
+  document.getElementById("lastChance");
+
+const retry =
+  document.getElementById("retry");
+
+const datePicker =
+  document.getElementById("datePicker");
+
+const timePicker =
+  document.getElementById("timePicker");
+
+const confirmDate =
+  document.getElementById("confirmDate");
+
+const resultDate =
+  document.getElementById("resultDate");
+
+
+let noX = 0;
+let noY = 0;
+
+let lastX = 0;
+let lastY = 0;
+
+let lastMove = 0;
+
+let ready = false;
+
+
+/* =========================
+   버튼 처음 위치
+========================= */
+
+function centerButtons(){
+
+  if(
+    mainScreen.style.display === "none"
+  ){
+    return;
+  }
+
+  const gap = 24;
+
+  const total =
+    yes.offsetWidth +
+    gap +
+    no.offsetWidth;
+
+  const start =
+    (window.innerWidth - total) / 2;
+
+  const area =
+    document
+      .querySelector(".buttons")
+      .getBoundingClientRect();
+
+  const y =
+    area.top +
+    (area.height - yes.offsetHeight) / 2;
+
+
+  yes.style.left =
+    Math.round(start) + "px";
+
+  yes.style.top =
+    Math.round(y) + "px";
+
+
+  noX =
+    start +
+    yes.offsetWidth +
+    gap;
+
+  noY = y;
+
+
+  no.style.left =
+    Math.round(noX) + "px";
+
+  no.style.top =
+    Math.round(noY) + "px";
+
+  no.style.transform =
+    "none";
+
+  ready = true;
+}
+
+
+/* =========================
+   아니요 버튼 이동
+========================= */
+
+function moveNo(){
+
+  const w =
+    no.offsetWidth;
+
+  const h =
+    no.offsetHeight;
+
+  const margin = 14;
+
+
+  noX =
+    Math.max(
+      margin,
+      Math.min(
+        noX,
+        window.innerWidth -
+        w -
+        margin
+      )
+    );
+
+
+  noY =
+    Math.max(
+      margin,
+      Math.min(
+        noY,
+        window.innerHeight -
+        h -
+        margin
+      )
+    );
+
+
+  no.style.left =
+    Math.round(noX) + "px";
+
+  no.style.top =
+    Math.round(noY) + "px";
+}
+
+
+/* =========================
+   아니요 도망가기
+========================= */
+
+function mouseMove(e){
+
+  if(!ready) return;
+
+  if(
+    mainScreen.style.display === "none"
+  ){
+    return;
+  }
+
+
+  const now =
+    performance.now();
+
+
+  if(
+    now - lastMove < 16
+  ){
+    return;
+  }
+
+
+  const dx =
+    e.clientX - lastX;
+
+  const dy =
+    e.clientY - lastY;
+
+
+  lastX = e.clientX;
+  lastY = e.clientY;
+
+
+  if(
+    dx === 0 &&
+    dy === 0
+  ){
+    return;
+  }
+
+
+  const w =
+    no.offsetWidth;
+
+  const h =
+    no.offsetHeight;
+
+
+  const near = 280;
+
+
+  const cx =
+    noX + w / 2;
+
+  const cy =
+    noY + h / 2;
+
+
+  const x =
+    e.clientX - cx;
+
+  const y =
+    e.clientY - cy;
+
+
+  if(
+    x*x + y*y >
+    near*near
+  ){
+    return;
+  }
+
+
+  lastMove = now;
+
+
+  const len =
+    Math.sqrt(
+      dx*dx + dy*dy
+    ) || 1;
+
+
+  let vx =
+    dx / len;
+
+  let vy =
+    dy / len;
+
+
+  /*
+    마우스가 빠를수록
+    아니요도 빠르게 도망감
+  */
+
+  const mouseSpeed =
+    Math.min(len,30);
+
+  const speed =
+    Math.max(
+      8,
+      mouseSpeed * 4
+    );
+
+
+  const margin = 14;
+
+  const maxX =
+    window.innerWidth -
+    w -
+    margin;
+
+  const maxY =
+    window.innerHeight -
+    h -
+    margin;
+
+
+  const wallPush = 120;
+
+
+  if(
+    noX <= margin + wallPush &&
+    vx < 0
+  ){
+    vx = 1.8;
+  }
+
+
+  if(
+    noX >= maxX - wallPush &&
+    vx > 0
+  ){
+    vx = -1.8;
+  }
+
+
+  if(
+    noY <= margin + wallPush &&
+    vy < 0
+  ){
+    vy = 1.8;
+  }
+
+
+  if(
+    noY >= maxY - wallPush &&
+    vy > 0
+  ){
+    vy = -1.8;
+  }
+
+
+  const vlen =
+    Math.sqrt(
+      vx*vx +
+      vy*vy
+    ) || 1;
+
+
+  noX +=
+    vx / vlen * speed;
+
+  noY +=
+    vy / vlen * speed;
+
+
+  moveNo();
+}
+
+
+/* =========================
+   네 클릭
+========================= */
+
+yes.addEventListener(
+  "click",
+  () => {
+
+    mainScreen.style.display =
+      "none";
+
+    dateScreen.style.display =
+      "block";
+
+
+    /*
+      오늘 이전 날짜 선택 금지
+    */
+
+    const today =
+      new Date();
+
+
+    const year =
+      today.getFullYear();
+
+    const month =
+      String(
+        today.getMonth() + 1
+      ).padStart(2,"0");
+
+    const day =
+      String(
+        today.getDate()
+      ).padStart(2,"0");
+
+
+    datePicker.min =
+      `${year}-${month}-${day}`;
+  }
+);
+
+
+/* =========================
+   아니요 클릭
+========================= */
+
+no.addEventListener(
+  "click",
+  () => {
+
+    mainScreen.style.display =
+      "none";
+
+    lastChance.style.display =
+      "block";
+  }
+);
+
+
+/* =========================
+   날짜 + 시간 확정
+========================= */
+
+confirmDate.addEventListener(
+  "click",
+  () => {
+
+    const selectedDate =
+      datePicker.value;
+
+    const selectedTime =
+      timePicker.value;
+
+
+    if(!selectedDate){
+
+      alert(
+        "데이트 날짜를 골라줘! 💕"
+      );
+
+      return;
+    }
+
+
+    if(!selectedTime){
+
+      alert(
+        "데이트 시간을 골라줘! ⏰"
+      );
+
+      return;
+    }
+
+
+    /*
+      날짜 변환
+      YYYY-MM-DD
+      →
+      M월 D일
+    */
+
+    const dateParts =
+      selectedDate.split("-");
+
+
+    const month =
+      Number(dateParts[1]);
+
+    const day =
+      Number(dateParts[2]);
+
+
+    /*
+      시간 변환
+      14:00
+      →
+      오후 2시
+    */
+
+    const timeParts =
+      selectedTime.split(":");
+
+
+    let hour =
+      Number(timeParts[0]);
+
+    const minute =
+      Number(timeParts[1]);
+
+
+    let ampm;
+
+    if(hour < 12){
+
+      ampm = "오전";
+
+    }else{
+
+      ampm = "오후";
+    }
+
+
+    let displayHour =
+      hour % 12;
+
+    if(displayHour === 0){
+      displayHour = 12;
+    }
+
+
+    let displayTime =
+      `${ampm} ${displayHour}시`;
+
+
+    if(minute !== 0){
+
+      displayTime +=
+        ` ${minute}분`;
+    }
+
+
+    /*
+      최종 문구
+    */
+
+    resultDate.textContent =
+      `${month}월 ${day}일 ${displayTime}에 데이트 하는 거야! 💕`;
+
+
+    dateScreen.style.display =
+      "none";
+
+    resultScreen.style.display =
+      "block";
+  }
+);
+
+
+/* =========================
+   다시하기
+========================= */
+
+retry.addEventListener(
+  "click",
+  () => {
+
+    lastChance.style.display =
+      "none";
+
+    resultScreen.style.display =
+      "none";
+
+    dateScreen.style.display =
+      "none";
+
+    mainScreen.style.display =
+      "block";
+
+
+    yes.style.display =
+      "block";
+
+    no.style.display =
+      "block";
+
+
+    datePicker.value = "";
+    timePicker.value = "";
+
+
+    setTimeout(
+      centerButtons,
+      10
+    );
+  }
+);
+
+
+/* =========================
+   화면 크기 변경
+========================= */
+
+window.addEventListener(
+  "resize",
+  centerButtons
+);
+
+
+/* =========================
+   시작
+========================= */
+
+window.addEventListener(
+  "load",
+  centerButtons
+);
+
+
+centerButtons();
+
+
+document.addEventListener(
+  "mousemove",
+  mouseMove,
+  {
+    passive:true
+  }
+);
+
+</script>
+
+</body>
+</html>
